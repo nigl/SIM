@@ -13,7 +13,7 @@ NumberCells=numel(Cars);
 % 
 % for Distance=1:SpeedMax
 %     %Phillis Magic Algorithm
-%     doCount = P^Distance*V  & ~Hindernis;
+%     doCount = (P^Distance*V)  & ~Hindernis;
 %     FreeCells=doCount.*(FreeCells+1);
 %     
 %     Hindernis = Hindernis | (P^Distance*Cars ~= 0);

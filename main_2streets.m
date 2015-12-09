@@ -6,12 +6,12 @@ global P;
 
 CellSize=7.5;% m
 TotalLength=2250;%m
-CellsNumber=50;%Anzahl Zellen bis zur Kreuzung
+CellsNumber=30;%Anzahl Zellen bis zur Kreuzung
 CellsTotalNumber=2*CellsNumber+1;%Insgesamt 2 Teilstücke je CellsNumber +2 Kreuzungszellen
 PLinger=0.05;%Trödelwkt
 SpeedMax=5;
 SpeedStart=1;%Maximale geschwindigkeit nach Stop bei Hindernis
-Density=0.05;
+Density=0.15;
 
 TimeSteps = 30;
 
@@ -96,3 +96,5 @@ for t=2:TimeSteps
     [CellsV(:,t,1), CellsV(:,t,2)] = shift(CellsV(:, t-1, 2), TempCellsV, CellsTotalNumber);
 end
 plotCars2(CellsH, CellsV, CellsNumber);
+plotAll(CellsV, CellsNumber);
+
