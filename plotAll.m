@@ -12,18 +12,18 @@ for t=1:size(Cells,2)
     if(t == 1)
         X = [CarsLeft, CarsRight];
         Y = [ones(size(CarsLeft)),  ones(size(CarsRight))];
-        %Z = [Cells(X1 ~= 0, t, 1), Cells(X2 ~= 0, t, 1)];
+        Z = Cells(Cells(:, t, 2) ~= 0, t, 2)';
     else
         X = [X, [CarsLeft, CarsRight]];
         Y = [Y, t*[ones(size(CarsLeft)),  ones(size(CarsRight))]];
-        %Z = [Z, [Cells(X1 ~= 0, t, 1), Cells(X2 ~= 0, t, 1)]];
+        Z = [Z, Cells(Cells(:, t, 2) ~= 0, t, 2)'];
     end
     
    
     
 end
 figure
-scatter(X, Y)
+scatter(X, Y, [], Z)
 end
 
 

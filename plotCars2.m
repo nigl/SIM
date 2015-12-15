@@ -1,6 +1,6 @@
-function [] = plotCars2( CellsH , CellsV, CellsNumber )
+function plotCars2( CellsH , CellsV, CellsNumber )
 
-figure
+figure;
 
 for j=1:size(CellsH,2)
 
@@ -29,6 +29,6 @@ for j=1:size(CellsH,2)
                     [-CellsNumber-1, CellsNumber+1], '-b', [-1, -1],...
                     [-CellsNumber-1, CellsNumber+1], '-b');
     axis([-CellsNumber-1 CellsNumber+1 -CellsNumber-1 CellsNumber+1])
-    pause(0.2)
+    pause(0.1)
 end;
 

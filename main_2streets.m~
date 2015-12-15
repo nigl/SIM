@@ -1,0 +1,66 @@
+clc;
+close all;
+clear all;
+
+% Anzahl der Kreuzungen
+crossingNum=1;
+% Anzahl Zellen bis zur Kreuzung
+cellNum=100;
+% Insgesamt 2 Teilst�cke je CellsNumber +2 Kreuzungszellen
+totalCellNum=(crossingNum+1)*cellNum+crossingNum; 
+% Tr�delwkt
+pLinger=0.30;
+% Maximale geschwindigkeit
+vmax=5;
+% Maximale geschwindigkeit nach Stop bei Hindernis
+speedStart=1;
+densityH=0.05;
+densityV=0.01:0.01:0.20;
+timesteps=100;
+
+sims = cell(numel(densityV, 1));
+for i  = 1:numel(densityV)
+    
+    % basic data
+    sim.timesteps = timesteps;
+    sim.vmax = vmax;
+    sim.pLinger = pLinger;
+    sim.densityV = densityV(i);
+    
+    % horizontale straße
+    [CellsH, ObstaclesH, crossingH] = init_street(cellNum, 1, densityH, vmax, timesteps);
+    sim.CellsH = CellsH;
+    sim.ObstaclesH = ObstaclesH;
+    sim.crossingH = crossingH;
+    
+    % vertikale straße
+    [CellsV, ObstaclesV, crossingV] = init_street(cellNum, 1, densityV(i), vmax, timesteps);
+        
+    % Doppelbelegung der Kreuzung(en) verhindern
+    if( CellsV(crossingV,1,1) ~= 0)
+        CellsV(crossingV,1,1) = 0;
+        CellsV(crossingV,1,2) = 0;
+    end
+    sim.vert{j}.CellsV = CellsV;
+    sim.vert{j}.ObstaclesV =ObstaclesH;
+    sim.vert{j}.crossingV = crossingV;
+    
+    [CellsH, ObstaclesH, crossingH] = init_street(cellNum, crossingNum, densityH, vmax, timesteps);
+    [CellsV, ObstaclesV, crossingV] = init_street(cellNum, crossingNum, densityV(i), vmax, timesteps);
+
+    % Doppelbelegung der Kreuzung verhindern
+    if( CellsV(crossingV,1,1) ~= 0)
+        CellsV(crossingV,1,1) = 0;
+        CellsV(crossingV,1,2) = 0;
+    end
+
+    % Nagelschreckenbergs Zauberalgorithmus
+    [CellsH, CellsV] = nagelschreckenberg(CellsH, CellsV, ObstaclesH, ObstaclesV, vmax, pLinger);
+    sim.CellsH = CellsH;
+    sim.CellsV = CellsV;
+    sim.densityV = densityV(i);
+    sims{i} = sim;
+end
+% plotCars2(CellsH, CellsV, cellsNumber);
+% plotAll(CellsV, cellsNumber);
+% plotAll(CellsH, cellsNumber);
