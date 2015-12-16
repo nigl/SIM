@@ -128,15 +128,16 @@ end
 
 handles.sims = sims;
 handles.cellNum = cellNum;
-guidata(hObject,handles);
 
 idx = floor(get(handles.slider1, 'Value'));
 sim = handles.sims{idx};
 plotCars2(sim.CellsH(:,1,:), sim.CellsV(:,1,:), handles.cellNum, handles.PlotKreuz);
 
+set(handles.ButtonStart, 'Enable', 'on');
+set(handles.ButtonRand, 'Enable', 'on');
+set(handles.PhillisPlotButton, 'Enable', 'on');
 
-
-
+guidata(hObject,handles);
 
 
 % --- If Enable == 'on', executes on mouse press in 5 pixel border.
@@ -246,6 +247,8 @@ function ButtonStart_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 set(handles.ButtonStart, 'Enable', 'off');
 set(handles.ButtonStart, 'Backgroundcolor', 'red');
+set(handles.ButtonRand, 'Enable', 'off');
+set(handles.PhillisPlotButton, 'Enable', 'off');
 drawnow;
 
 for i=1:numel(handles.sims)
@@ -254,6 +257,8 @@ end
 
 set(handles.ButtonStart, 'Enable', 'on');
 set(handles.ButtonStart, 'Backgroundcolor', 'green');
+set(handles.PhillisPlotButton, 'Enable', 'on');
+set(handles.ButtonRand, 'Enable', 'on');
 
 guidata(hObject,handles);
 
@@ -436,3 +441,8 @@ plotDensity(handles.sims, str2double(get(handles.BoxFlowPoint, 'String')), handl
 idx = floor(get(handles.slider1, 'Value'));
 sim = handles.sims{idx};
 plotCars2(sim.CellsH, sim.CellsV, handles.cellNum, handles.PlotKreuz);
+
+set(handles.ButtonStart, 'Enable', 'on');
+set(handles.PhillisPlotButton, 'Backgroundcolor', 'green');
+set(handles.PhillisPlotButton, 'Enable', 'on');
+set(handles.ButtonRand, 'Enable', 'on');
