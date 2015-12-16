@@ -16,7 +16,7 @@ flowV = cellfun(@(s) calc_flow(s.CellsV, flow_point, s.numCarsV), sims);
 figure;
 plot(1:numel(sims), densityV, 1:numel(sims), act_densityV)
 figure;
-plot(act_densityV, flowH)
+plot(densityV, flowH)
 figure;
 plot(densityV, flowH, '-o', densityV, flowV, '-x')
 grid on;
@@ -26,6 +26,12 @@ end
 function [flow] = calc_flow(Cells, flow_point, numCars)
 % f√ºr jeden Zeitschritt die Anzahl der autos die "vor" und "nach" dem flowpoint stehen
 % berechnen (es wird nur in richtung der Strecken dimension summiert!)
+
+% keine autos keine kekse
+if numCars == 0
+    flow = 0;
+    return;
+end
 
 % Betrachte von einem auf den anderen Zeitpunkt die
 % Autonummer die am n‰chsten zum Obstacle ist

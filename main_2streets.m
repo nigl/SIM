@@ -10,8 +10,8 @@ pLinger=0.30;
 vmax=5;
 % Maximale geschwindigkeit nach Stop bei Hindernis
 speedStart=1;
-densityH=0.05;
-densityV=0.01:0.5:0.50;
+densityH=0.30;
+densityV=0.01:0.001:0.99;
 timesteps=100;
 
 sims = cell(numel(densityV, 1));
@@ -51,4 +51,5 @@ end
 % plotCars2(sims{1}.CellsH, sims{1}.CellsV, cellNum);
 % plotAll(sims{1}.CellsV, cellNum);
 % plotAll(sims{1}.CellsH, cellNum);
-plotDensity(sims, cellNum+1);
+% plotAllAnimate(sims, cellNum);
+plotDensity(sims.CellsH, cellNum+1);
