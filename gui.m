@@ -22,7 +22,7 @@ function varargout = gui(varargin)
 
 % Edit the above text to modify the response to help gui
 
-% Last Modified by GUIDE v2.5 10-Dec-2015 11:26:36
+% Last Modified by GUIDE v2.5 16-Dec-2015 15:06:50
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -78,12 +78,51 @@ function ButtonRand_Callback(hObject, eventdata, handles)
 % hObject    handle to ButtonRand (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-% set(handles.BoxDichteV,'String','A');
-A = get(handles.BoxDichteV,'String');
-A = Func(A);
-X = (0:0.01:1);
-plot(handles.PlotKreuz,X,sin(X))
-disp(A);
+% set(handles.BoxDichteVStart,'String','A');
+cellNum=str2double(get(handles.BoxLaengeAbschnitte, 'String'));
+pLinger=str2double(get(handles.BoxTroedeln, 'String'));
+vmax=str2double(get(handles.BoxMaxGeschwindigkeit, 'String'));
+densityH=str2double(get(handles.BoxDichteH, 'String'));
+densVStart=str2double(get(handles.BoxDichteVStart, 'String'));
+densVEnde=str2double(get(handles.BoxDichteVEnde, 'String'));
+densVWeite=str2double(get(handles.BoxDichteVWeite, 'String'));
+densityV=densVStart:densVWeite:densVEnde;
+timesteps=str2double(get(handles.BoxZeitschritte, 'String'));
+
+sims = cell(numel(densityV), 1);
+for i  = 1:numel(densityV)
+    %% basic data
+    sim.timesteps = timesteps;
+    sim.vmax = vmax;
+    sim.pLinger = pLinger;
+    sim.densityV = densityV(i);
+    sim.densityH = densityH;
+    
+    %% horizontale straße
+    [CellsH, ObstaclesH, crossingH] = init_street(cellNum, 1, densityH, vmax, timesteps);
+    sim.CellsH = CellsH;
+    sim.ObstaclesH = ObstaclesH;
+    sim.crossingH = crossingH;
+    
+    %% vertikale straße
+    [CellsV, ObstaclesV, crossingV] = init_street(cellNum, 1, densityV(i), vmax, timesteps);
+    % Doppelbelegung der Kreuzung(en) verhindern
+    if( CellsV(crossingV,1,1) ~= 0)
+        CellsV(crossingV,1,1) = 0;
+        CellsV(crossingV,1,2) = 0;
+    end
+    sim.CellsV = CellsV;
+    sim.ObstaclesV = ObstaclesV;
+    sim.crossingV = crossingV;
+    
+    % Anzahl der tatsaechlichen Autos
+    sim.numCarsV = sum(sim.CellsV(:, 1, 2) ~= 0);
+    sim.numCarsH = sum(sim.CellsH(:, 1, 2) ~= 0);
+    sims{i} = sim;
+end
+
+handles.sims = sims;
+guidata(hObject,handles);
 
 
 % --- If Enable == 'on', executes on mouse press in 5 pixel border.
@@ -95,18 +134,18 @@ function ButtonRand_ButtonDownFcn(hObject, eventdata, handles)
 
 
 
-function BoxDichteV_Callback(hObject, eventdata, handles)
-% hObject    handle to BoxDichteV (see GCBO)
+function BoxDichteVStart_Callback(hObject, eventdata, handles)
+% hObject    handle to BoxDichteVStart (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of BoxDichteV as text
-%        str2double(get(hObject,'String')) returns contents of BoxDichteV as a double
+% Hints: get(hObject,'String') returns contents of BoxDichteVStart as text
+%        str2double(get(hObject,'String')) returns contents of BoxDichteVStart as a double
 
 
 % --- Executes during object creation, after setting all properties.
-function BoxDichteV_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to BoxDichteV (see GCBO)
+function BoxDichteVStart_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to BoxDichteVStart (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -141,18 +180,18 @@ end
 
 
 
-function BoxLaenge_Callback(hObject, eventdata, handles)
-% hObject    handle to BoxLaenge (see GCBO)
+function BoxLaengeAbschnitte_Callback(hObject, eventdata, handles)
+% hObject    handle to BoxLaengeAbschnitte (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of BoxLaenge as text
-%        str2double(get(hObject,'String')) returns contents of BoxLaenge as a double
+% Hints: get(hObject,'String') returns contents of BoxLaengeAbschnitte as text
+%        str2double(get(hObject,'String')) returns contents of BoxLaengeAbschnitte as a double
 
 
 % --- Executes during object creation, after setting all properties.
-function BoxLaenge_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to BoxLaenge (see GCBO)
+function BoxLaengeAbschnitte_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to BoxLaengeAbschnitte (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -164,18 +203,18 @@ end
 
 
 
-function BoxZeit_Callback(hObject, eventdata, handles)
-% hObject    handle to BoxZeit (see GCBO)
+function BoxZeitschritte_Callback(hObject, eventdata, handles)
+% hObject    handle to BoxZeitschritte (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of BoxZeit as text
-%        str2double(get(hObject,'String')) returns contents of BoxZeit as a double
+% Hints: get(hObject,'String') returns contents of BoxZeitschritte as text
+%        str2double(get(hObject,'String')) returns contents of BoxZeitschritte as a double
 
 
 % --- Executes during object creation, after setting all properties.
-function BoxZeit_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to BoxZeit (see GCBO)
+function BoxZeitschritte_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to BoxZeitschritte (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -192,6 +231,12 @@ function ButtonStart_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+for i=1:numel(handles.sims)
+    handles.sims{i} = nagelschreckenberg(handles.sims{i});
+end
+
+guidata(hObject,handles);
+
 
 
 function BoxTroedeln_Callback(hObject, eventdata, handles)
@@ -206,6 +251,75 @@ function BoxTroedeln_Callback(hObject, eventdata, handles)
 % --- Executes during object creation, after setting all properties.
 function BoxTroedeln_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to BoxTroedeln (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function BoxMaxGeschwindigkeit_Callback(hObject, eventdata, handles)
+% hObject    handle to BoxMaxGeschwindigkeit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of BoxMaxGeschwindigkeit as text
+%        str2double(get(hObject,'String')) returns contents of BoxMaxGeschwindigkeit as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function BoxMaxGeschwindigkeit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to BoxMaxGeschwindigkeit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function BoxDichteVEnde_Callback(hObject, eventdata, handles)
+% hObject    handle to BoxDichteVEnde (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of BoxDichteVEnde as text
+%        str2double(get(hObject,'String')) returns contents of BoxDichteVEnde as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function BoxDichteVEnde_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to BoxDichteVEnde (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function BoxDichteVWeite_Callback(hObject, eventdata, handles)
+% hObject    handle to BoxDichteVWeite (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of BoxDichteVWeite as text
+%        str2double(get(hObject,'String')) returns contents of BoxDichteVWeite as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function BoxDichteVWeite_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to BoxDichteVWeite (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
