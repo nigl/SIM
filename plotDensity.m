@@ -1,25 +1,19 @@
-function plotDensity( sims, flow_point )
+function plotDensity( sims, flow_point , fig)
 %PLOTDENSITY Plot des Fundamentaldiagramms
 
 % das was wir als v density eingestellt haben
 densityV = cellfun(@(s) s.densityV, sims);
 
 % die tatsaechliche dichte (anzahl der autos / anzahl der zellen)
-carsV = cellfun(@(s) s.numCarsV, sims);
-act_densityV = carsV ./ numel(sims{1}.CellsV(:, 1, 2));
+%carsV = cellfun(@(s) s.numCarsV, sims);
+%act_densityV = carsV ./ numel(sims{1}.CellsV(:, 1, 2));
 
 
 % den fluss annaehern (die anzahl der autos, die den flow_point Ueberqueren)
 flowH = cellfun(@(s) calc_flow(s.CellsH, flow_point, s.numCarsH), sims);
 flowV = cellfun(@(s) calc_flow(s.CellsV, flow_point, s.numCarsV), sims);
 
-figure;
-plot(1:numel(sims), densityV, 1:numel(sims), act_densityV)
-figure;
-plot(densityV, flowH)
-figure;
-plot(densityV, flowH, '-o', densityV, flowV, '-x')
-grid on;
+plot(fig, densityV, flowH, '-o', densityV, flowV, '-x')
 
 end
 

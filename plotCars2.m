@@ -1,6 +1,4 @@
-function plotCars2( CellsH , CellsV, CellsNumber )
-
-figure;
+function plotCars2( CellsH , CellsV, CellsNumber , fig)
 
 for j=1:size(CellsH,2)
 
@@ -23,12 +21,12 @@ for j=1:size(CellsH,2)
     
     XH = [CarsLeft, CarsRight];
     YH = [zeros(size(CarsLeft)),  zeros(size(CarsRight))];
-    plot(XV, YV, 'o', XH, YH, 'or',  ...
+    plot(fig, XV, YV, 'o', XH, YH, 'or',  ...
                     [-CellsNumber-1, CellsNumber+1], [-1, -1], '-b',...
                     [-CellsNumber-1, CellsNumber+1], [1, 1], '-b', [1, 1],...
                     [-CellsNumber-1, CellsNumber+1], '-b', [-1, -1],...
                     [-CellsNumber-1, CellsNumber+1], '-b');
-    axis([-CellsNumber-1 CellsNumber+1 -CellsNumber-1 CellsNumber+1])
+    axis(fig, [-CellsNumber-1 CellsNumber+1 -CellsNumber-1 CellsNumber+1])
     pause(0.1)
 end;
 
