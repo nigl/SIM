@@ -22,7 +22,7 @@ function varargout = gui(varargin)
 
 % Edit the above text to modify the response to help gui
 
-% Last Modified by GUIDE v2.5 16-Dec-2015 15:06:50
+% Last Modified by GUIDE v2.5 16-Dec-2015 16:36:51
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -89,6 +89,11 @@ densVWeite=str2double(get(handles.BoxDichteVWeite, 'String'));
 densityV=densVStart:densVWeite:densVEnde;
 timesteps=str2double(get(handles.BoxZeitschritte, 'String'));
 
+set(handles.slider1, 'Value', 1);
+set(handles.slider1, 'Min', 1);
+set(handles.slider1, 'Max', numel(densityV));
+set(handles.BoxFlowPoint, 'String', cellNum+1);
+
 sims = cell(numel(densityV), 1);
 for i  = 1:numel(densityV)
     %% basic data
@@ -122,7 +127,16 @@ for i  = 1:numel(densityV)
 end
 
 handles.sims = sims;
+handles.cellNum = cellNum;
 guidata(hObject,handles);
+
+idx = floor(get(handles.slider1, 'Value'));
+sim = handles.sims{idx};
+plotCars2(sim.CellsH(:,1,:), sim.CellsV(:,1,:), handles.cellNum, handles.PlotKreuz);
+
+
+
+
 
 
 % --- If Enable == 'on', executes on mouse press in 5 pixel border.
@@ -230,12 +244,20 @@ function ButtonStart_Callback(hObject, eventdata, handles)
 % hObject    handle to ButtonStart (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+set(handles.ButtonStart, 'Enable', 'off');
+set(handles.ButtonStart, 'Backgroundcolor', 'red');
+drawnow;
 
 for i=1:numel(handles.sims)
     handles.sims{i} = nagelschreckenberg(handles.sims{i});
 end
 
+set(handles.ButtonStart, 'Enable', 'on');
+set(handles.ButtonStart, 'Backgroundcolor', 'green');
+
 guidata(hObject,handles);
+
+
 
 
 
@@ -328,3 +350,89 @@ function BoxDichteVWeite_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+% --- Executes on slider movement.
+function slider1_Callback(hObject, eventdata, handles)
+% hObject    handle to slider1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'Value') returns position of slider
+%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+
+idx =  floor(get(handles.slider1, 'Value'));
+sim = handles.sims{idx};
+
+set(handles.BoxDichteAnimation, 'String', sim.densityV);
+
+
+% --- Executes during object creation, after setting all properties.
+function slider1_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to slider1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: slider controls usually have a light gray background.
+if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor',[.9 .9 .9]);
+end
+
+
+
+function BoxDichteAnimation_Callback(hObject, eventdata, handles)
+% hObject    handle to BoxDichteAnimation (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of BoxDichteAnimation as text
+%        str2double(get(hObject,'String')) returns contents of BoxDichteAnimation as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function BoxDichteAnimation_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to BoxDichteAnimation (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function BoxFlowPoint_Callback(hObject, eventdata, handles)
+% hObject    handle to BoxFlowPoint (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of BoxFlowPoint as text
+%        str2double(get(hObject,'String')) returns contents of BoxFlowPoint as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function BoxFlowPoint_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to BoxFlowPoint (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in PhillisPlotButton.
+function PhillisPlotButton_Callback(hObject, eventdata, handles)
+% hObject    handle to PhillisPlotButton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+plotDensity(handles.sims, str2double(get(handles.BoxFlowPoint, 'String')), handles.PlotDichte);
+
+idx = floor(get(handles.slider1, 'Value'));
+sim = handles.sims{idx};
+plotCars2(sim.CellsH, sim.CellsV, handles.cellNum, handles.PlotKreuz);
