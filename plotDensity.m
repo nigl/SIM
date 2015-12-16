@@ -4,38 +4,45 @@ function plotDensity( sims, flow_point )
 % das was wir als v density eingestellt haben
 densityV = cellfun(@(s) s.densityV, sims);
 
-% die tatsächliche dichte (anzahl der autos / anzahl der zellen)
-act_densityV = cellfun(@(s) sum(s.CellsV(:, 1, 2) ~= 0) / numel(s.CellsV(:, 1, 2)), sims);
+% die tatsaechliche dichte (anzahl der autos / anzahl der zellen)
+carsV = cellfun(@(s) s.numCarsV, sims);
+act_densityV = carsV ./ numel(sims{1}.CellsV(:, 1, 2));
 
-% den fluss annähern (die anzahl der autos, die den flow_point überqueren)
-flowH = cellfun(@(s) calc_flow(s.CellsH, flow_point), sims);
-flowV = cellfun(@(s) calc_flow(s.CellsV, flow_point), sims);
+
+% den fluss annaehern (die anzahl der autos, die den flow_point Ueberqueren)
+flowH = cellfun(@(s) calc_flow(s.CellsH, flow_point, s.numCarsH), sims);
+flowV = cellfun(@(s) calc_flow(s.CellsV, flow_point, s.numCarsV), sims);
 
 figure;
 plot(1:numel(sims), densityV, 1:numel(sims), act_densityV)
-%figure;
-%plot(act_densityV, flowH)
+figure;
+plot(act_densityV, flowH)
 figure;
 plot(densityV, flowH, '-o', densityV, flowV, '-x')
 grid on;
 
 end
 
-function [flow] = calc_flow(Cells, flow_point)
+function [flow] = calc_flow(Cells, flow_point, numCars)
 % für jeden Zeitschritt die Anzahl der autos die "vor" und "nach" dem flowpoint stehen
 % berechnen (es wird nur in richtung der Strecken dimension summiert!)
-B = sum(Cells(1:flow_point, :, 2) ~= 0, 1);
-%A = sum(Cells(flow_point+1:end, :, 2) ~= 0, 1);
 
-% ist nun von einem zeitschritt auf dem anderen (diff) die anzahl "vor"
-% dem flow_piont  kleiner geworden so haben autos diesen Punkt passiert
-% TODO dass stimmt nicht ganz, denn wenn im selben zeitschritt eines von
-% "nach" der kreuzung auf "vor" die kreuzung wechselt und eines über die 
-% kreuzung fährt, dann sehen wir keine änderung...
-change = diff(B);
-change = change(change < 0);
+% Betrachte von einem auf den anderen Zeitpunkt die
+% Autonummer die am n�chsten zum Obstacle ist
+CarsBef = [Cells(flow_point+1:end, :, 2); Cells(1:flow_point, :, 2)];
 
-flow = -sum(change);
+lastCar = zeros(size(CarsBef, 2), 1);
+for i=1:size(CarsBef, 2)
+    cars = CarsBef(:, i);
+    not_empty = cars ~= 0;
+    cars = cars(not_empty);
+    lastCar(i) = cars(end);
+end
+change = -diff(lastCar);
+
+% Korrektur der negativen Werte
+change(change < 0) = change(change < 0) + numCars;
+flow = sum(change);
 
 end
 

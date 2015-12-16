@@ -11,7 +11,7 @@ vmax=5;
 % Maximale geschwindigkeit nach Stop bei Hindernis
 speedStart=1;
 densityH=0.05;
-densityV=0.01:0.01:0.50;
+densityV=0.01:0.5:0.50;
 timesteps=100;
 
 sims = cell(numel(densityV, 1));
@@ -39,6 +39,10 @@ for i  = 1:numel(densityV)
     sim.CellsV = CellsV;
     sim.ObstaclesV = ObstaclesV;
     sim.crossingV = crossingV;
+    
+    % Anzahl der tatsaechlichen Autos
+    sim.numCarsV = sum(sim.CellsV(:, 1, 2) ~= 0);
+    sim.numCarsH = sum(sim.CellsH(:, 1, 2) ~= 0);
     
     %% Nagelschreckenbergs Zauberalgorithmus
     sim = nagelschreckenberg(sim);
