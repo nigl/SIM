@@ -1,12 +1,6 @@
 function [ sim ] = nagelschreckenberg(sim)
 %nagelschreckenberg Simulates the nagelschreckenberg model with the given initial conditions
 
-% Matrix Ph / Pv shiftet Vektor der L�nge totalCellNum um 1 hoch
-%totalCellNum = size(sim.CellsH, 1);
-%Ph=diag(ones(1,totalCellNum-1), 1) + diag(1,-totalCellNum+1);
-%totalCellNum = size(sim.vert{1}.CellsV, 1);
-%Pv=diag(ones(1,totalCellNum-1), 1) + diag(1,-totalCellNum+1);
-
 for t=2:sim.timesteps
     %% Bremsen und Beschleunigen von Autos nicht vor Hindernissen
     TempCellsH = adjustSpeed(sim.CellsH(:, t-1, 1), ...
