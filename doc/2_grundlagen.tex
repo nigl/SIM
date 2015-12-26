@@ -1,0 +1,47 @@
+\chapter{Grundlagen}
+
+\section{Nagelschreckenberg Model}
+TODO beschreiben des nagelschreckenberg models.
+Also ablauf und evtl. auch schon das Fundamentaldiagram.
+
+TODO das hier anpassen...
+
+\begin{algorithm}[H]
+ %\SetLine % For v3.9
+ %\SetAlgoLined % For previous releases [?]
+ \KwData{ \\
+   Seitenlänge quadratisches Eingabebild: \(n\)\\
+   RGB-Werte Eingabebild: \(r(x,y), \; b(x,y), \; g(x,y) \quad x,y \in \{0, \dots, n-1\} \) 
+ }
+ \KwResult{ \\
+   RGB-Werte neues Bild: \(\overline{r}(x,y), \; \overline{b}(x,y), \; \overline{g}(x,y) \quad x,y \in \{0, \dots, n-1\} \)
+ }
+
+ %initialization\;
+ \For{ \(k \in \{1, \cdots, n\}\) }{
+
+	\For{ \(j \in \{1, \cdots, n\}\) }
+	{
+    \mbox{}
+
+    \(\overline{x} = 2k+j \; \modk\);
+
+    \(\overline{y} = k+j \; \modk\);
+    
+    \mbox{}
+
+    \(\overline{r}(\overline{x}, \overline{y}) =  r(k,j)\);
+
+    \(\overline{g}(\overline{x}, \overline{y}) =  g(k,j)\);
+
+    \(\overline{b}(\overline{x}, \overline{y}) =  b(k,j)\);
+	}
+
+ }
+ \caption{Nagelschreckenberg Algorithmus}
+ \label{algo:nagelsberg}
+\end{algorithm}
+
+\section{Erweitertes Model für Kreuzungen}
+TODO unser model erklären (autos bremsen vor kreuzung immer ab,
+... etc)

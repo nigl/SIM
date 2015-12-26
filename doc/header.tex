@@ -1,0 +1,214 @@
+\documentclass[pagesize=pdftex,paper=a4,bibliography=totoc,listof=totoc,12pt]{scrreprt}
+
+%%%%%%%%%%%%%%%%%DATEN%%%%%%%%%%%%%%%%%
+%Erstellungsdatum
+\date{\today}
+
+%%%%%%%%%%%%%%%%%pakete%%%%%%%%%%%%%%%%%
+% böses hackpaket
+\usepackage{scrhack}
+
+%neue Rechtschreibung
+\usepackage[ngerman]{babel}
+\usepackage{babelbib}
+ 
+%\usepackage[T1]{fontenc}
+%Umlaute ermölichen utf8 ( latin1)
+\usepackage[utf8]{inputenc}
+ 
+% Tabellen
+\usepackage{array}
+ 
+% Schriftfarben
+\usepackage{color}
+
+% FloatBarrier
+\usepackage{placeins}
+%Bilder
+\usepackage{float}
+\usepackage{floatflt}
+\usepackage[pdftex]{graphicx}
+\usepackage{caption} %für subfigure
+\usepackage{subcaption} % für subfigure
+\DeclareGraphicsRule{*}{mps}{*}{}
+%\usepackage{PSTricks}
+
+%Math
+\usepackage{amsmath}
+% bessere theorem umgebung als amsthm (zeilen umbruch nach überschritf und aufzählung)
+\usepackage[amsmath, thmmarks]{ntheorem} 
+\usepackage{amssymb}
+\usepackage{mathrsfs} % \mathscr command for categories
+\usepackage[all]{xy} % Kommutative-Diagramme
+
+% Pseudocode in latex
+\usepackage{algorithm2e}
+
+%Nomenclature
+\usepackage[intoc]{nomencl}
+
+%Kopf-/Fußzeilen
+\usepackage{fancyhdr}
+
+%Hyperref für Bookmarks im PDF
+\usepackage[pdftex, pagebackref]{hyperref}
+
+%%%%%%%%%%%%%%%%%%%%seitencfg%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pagestyle{fancy}
+\fancyhf{}
+%Kopfzeile links bzw. innen
+\fancyhead[L]{\nouppercase{\leftmark}}
+%Kopfzeile rechts bzw. außen
+\fancyhead[R]{\thepage}
+%Linie open
+\renewcommand{\headrulewidth}{0.5pt}
+%Fußzeile links bzw. innen
+\fancyfoot[L]{Hausarbeit Simulation}
+%Fußzeile rechts bzw. außen
+\fancyfoot[R]{\today}
+%Linie unten
+\renewcommand{\footrulewidth}{0.5pt}
+
+\hypersetup {
+pdftitle = {Verkehrsflusssimulation einer Kreuzung},
+pdfsubject = {Hausarbeit Simulation}, 
+pdfauthor = {Julian Berndt, Hannah Dusch, Martin Kraus, Philipp Schwarz},
+pdfhighlight = {/O},
+pdfkeywords = {Nagelschreckenberg, Kreuzung, Verkehrssimulation, Fundamentaldiagramm}, colorlinks = {false},
+bookmarksnumbered = {true},
+citebordercolor = {1 1 1},
+linkbordercolor = {1 1 1},
+urlbordercolor = {1 1 1},
+bookmarksopen = {true},
+bookmarksopenlevel = {1}
+}
+
+% Nummerierungen bei Aufzählungen (Erste Ebene Römisch) 
+\renewcommand{\theenumi}{\roman{enumi}}
+\renewcommand{\labelenumi}{\theenumi)}
+
+%%%%%%%%%%%%%%%%%%%EIGENE-BEFEHLE%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\ncl}[2]{\nomenclature{\textit{#1}}{\textcolor{white}{test}\\#2}}
+\newcommand{\glossar}[1]{\textit{#1}\glossary{\textit{#1}}}
+
+%Bilder
+\newcommand{\pic}[1]{Abbildung \ref{#1}}
+\newcommand{\picp}[1]{Abbildung \ref{#1} Seite \pageref{#1}}
+%Tabellen
+\newcommand{\tab}[1]{Tabelle \ref{#1}}
+\newcommand{\tabp}[1]{Tabelle \ref{#1} Seite \pageref{#1}}
+%Darstellung eines Links im Quellenverzeichnis
+\newcommand{\urlg}[2]{\url{#1}\\zuletzt abgerufen am #2}
+%Verweise
+\newcommand{\see}[1]{(siehe Kapitel \ref{#1})}
+\newcommand{\seeo}[1]{siehe Kapitel \ref{#1}}
+\newcommand{\seea}[1]{(siehe Anhang \ref{#1})}
+\newcommand{\refThmIt}[1]{\textit{\ref{#1})}}
+% Fett und Schief
+\newcommand{\textbit}[1]{\textbf{\textit{#1}}}
+%\newcommand{\beweis}{\textbf{Beweis:} }
+%\newcommand{\qed}{\hfill \(\square\)}
+%\newcommand{\noteH}{\textbf{Bemerkung:} }
+\newcommand{\defH}[1]{\underline{#1}}
+
+% theoremartige Konstrukte
+%-------------------------
+% diese haben keinen zeilenumbruch nach d. Überschrift
+\theoremstyle{plain}
+\newtheorem{Def}{Definition}[chapter]
+\newtheorem{Satz}{Satz}[chapter]
+\newtheorem{Korollar}{Korollar}[chapter]
+\newtheorem{Lemma}{Lemma}[chapter]
+
+% Jetzt mit Zeilen umbruch nach Überschrift 
+% (Counter aber von obigen Konstrukten benutzen)
+\theoremstyle{break}
+\newtheorem{Def-break}[Def]{Definition}
+\newtheorem{Satz-break}[Satz]{Satz}
+\newtheorem{Korollar-break}[Korollar]{Korollar}
+\newtheorem{Lemma-break}[Lemma]{Lemma}
+
+% Bemerkungen
+\theoremstyle{plain}
+\theorembodyfont{\normalfont}
+\theoremseparator{ :}
+\newtheorem{Bem}{Bemerkung}[chapter]
+
+% Beispiele
+\theoremstyle{plain}
+\theorembodyfont{\normalfont}
+\theoremseparator{ :}
+\newtheorem{Bsp}{Beispiel}[chapter]
+
+% Eigene beweisumgebung
+\theoremstyle{nonumberplain}
+\theoremheaderfont{\itshape}
+\theorembodyfont{\normalfont}
+\theoremseparator{.}
+\theoremsymbol{\ensuremath{\square}}
+\newtheorem{proof}{Beweis}
+\newtheorem{proofsketch}{Beweisskizze}
+% Fix für die Beweisumgebung:
+% Steht vor \end{proof} ein \end{align}, so wird das 
+% qed-symbol nicht so schön gesetzt: \mbox{} einfügen
+%-----------------------------
+
+% mathebefehle
+%-------------
+\DeclareMathOperator{\Hom}{Hom} % Klasse der Morphismen einer Kategorie
+\DeclareMathOperator{\Morph}{Morph} % Klasse der Morphismen einer Kategorie
+\DeclareMathOperator{\Obj}{Ob} % Klasse der Objekte in der Kategorie
+\DeclareMathOperator{\id}{id} % Identische Abbildung / Morphismus
+\DeclareMathOperator{\mod1}{(mod\mbox{ }1)} % mein Modulo-Operator
+\DeclareMathOperator{\modk}{(mod\mbox{ }n)} % mein Modulo-Operator
+\DeclareMathOperator{\diverg}{div} % Divergenz
+\newcommand*\rfrac[2]{{}^{#1}\!/_{#2}} % schönere Brüche (Schiefes bruchzeichen)
+\newcommand{\sprod}[2]{ \left\langle #1 , #2 \right\rangle } % skalarprodukt
+\newcommand{\dcup}{\mathbin{\dot{\cup}}} % Disjunkte Vereinigung
+\newcommand{\dbigcup}{\mathbin{\dot{\bigcup}}} % Disjunkte Vereinigung
+% Kategorien
+\newcommand{\Ens}{{\mathscr{E}\!ns}} % Kategorie der Mengen
+\newcommand{\Top}{{\mathscr{T}op}} % Kategorie der topologischen Räume
+\newcommand{\Mess}{{\mathscr{M}\!ess}} % Kategorie der Messräume
+\newcommand{\Mass}{{\mathscr{M}\!ass}} % Kategorie der Messräume
+\newcommand{\Ban}{{\mathscr{B}an}} % Kategorie der Bannachräume
+\newcommand{\Hil}{{\mathscr{H}il}} % Kategorie der Hilberträume
+\newcommand{\Dyn}{{\mathscr{D}yn}} % Kategorie der dynamischen Systeme
+\newcommand{\Mdyn}{{\mathscr{M}\!dyn}} % Kategorie der maßtheoretischen dynamischen Systeme
+\newcommand{\Tdyn}{{\mathscr{T}\!dyn}} % Kategorie der topologischen dynamischen Systeme
+%\newcommand{\Ban1}{{\mathscr{B}an_1}} % Kategorie der Banachräume (Isometrien)
+
+%\newcommand{\comp
+%\newcommand{\comp}[1]{{#1}^{c}} % Mengenkomplement
+%\newcommand{\compm}[2]{{#1}^{c(#2)}} % Mengenkomplement mit Grundmenge
+%\newcommand{\compm}[2]{{#1}^{c\mathsf{[}#2\mathsf{]}}} % Mengenkomplement mit Grundmenge
+%\newcommand{\compm}[2]{{#1}^{\complement\tiny{#2}}} % Mengenkomplement mit Grundmenge
+
+%%%%%%%%%%%%%%%%%%%%NOMENCLATURE/GLOSSAR%%%%%%%%%%%%%%%%%%%
+%Nomenclature 
+\makenomenclature
+
+%Glossar
+%\include{glossar}
+
+%%chemie
+%\usepackage[version=3]{mhchem}
+
+%own commands
+%Merkbox:
+%\begin{merkbox}
+% text
+%nomenclature}
+% \newsavebox\TBox
+% \newenvironment{merkbox}
+%{%\par\noindent
+% \begin{lrbox}{\TBox}
+% \varwidth{\textwidth-2.5\fboxsep}
+% }{\endvarwidth\end{lrbox}%
+% \textcolor{orange}{\textbf{Merke:}}\\[1mm]
+% \Ovalbox{\usebox\TBox}\par
+%}
+
+%markierungen
+%\newcommand{\texthigh}[1]{\textcolor{orange}\textbf{#1}}
+%\newcommand{\texthead}[1]{\emph{#1:}\hline}
