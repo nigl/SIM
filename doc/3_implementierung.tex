@@ -1,7 +1,26 @@
 \chapter{Simulationsprogramm}
+Zur Bewältigung der in Kapitel \ref{sec:aufgabenstellung} beschriebenen
+Aufgaben wurde das erweiterte Nagelschreckenberg Model \see{sec:erwmodel}
+durch ein Matlabskript umgesetzt. Im folgenden wird dieses
+Programm besprochen.
 
 \section{Programmbedienung}
 TODO beschreibung der Programmfunktionalität (buttons anzeigen etc.)
 
 \section{Implementierung}
-TODO beschreibung der Programmtechnischen umsetzung
+Von Beginn an wurde bei der Umsetzung darauf geachtet, wo immer es möglich 
+war, auf Schleifen zu verzichten und stattdessen die in Matlab sehr effizient 
+umgesetzten Matrixoperationen zu benutzen. Dies bedeutet vor allem, dass als 
+grundlegende Datenstruktur Matrizen zu benutzen sind. 
+
+Es besteht eine Kreuzung aus zwei Straßen, welche zur Vereinfachung als Horizontale und Vertikale
+bezeichnet werden. Beide Straßen haben den den Kreuzungspunkt als gemeinsamen Straßenabschnitt. Dieser
+wird zweimal, in der Horizontalen und in der Vertikalen, abgespeichert.
+
+Eine Straße wird durch zwei Matrizen \(S^{1}, S^{2}\) repräsentiert. 
+Die \(t\)-te Zeile dieser Matrizen stellt die Situation zur Zeit \(t\) (mit \(1 \leq t \leq T\)) dar, 
+wobei die Spalten den Zellen entsprechen in denen ein Auto stehen kann. 
+Steht also zur Zeit \(t\) das Auto mit Nummer \(k\) (\(1 \leq k \leq K\)) und Geschwindigkeit \(v_k\) in der \(n\)-ten Zelle, 
+so so gilt \( S^{2}_{t, n} = k\) und \(S^{1}_{t, n} = v_k\). 
+Ist andererseits zur Zeit \(t\) die \(n\)-te Zelle nicht belegt so gilt: \(S^2_{t, n} = 0 = S^1_{t, n}\).
+Kurz gesagt \(S^{1}\) die Geschwindigkeiten und \(S^{2}\) die Autonummern zu jeder stelle und jedem Zeitpunkt.
