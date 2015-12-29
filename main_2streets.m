@@ -11,7 +11,7 @@ vmax=5;
 % Maximale geschwindigkeit nach Stop bei Hindernis
 speedStart=1;
 densityH=0.30;
-densityV=0.01:0.001:0.99;
+densityV=0.01:0.1:0.99;
 timesteps=100;
 
 sims = cell(numel(densityV, 1));
