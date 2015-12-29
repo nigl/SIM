@@ -4,17 +4,21 @@ function plotDensity( sims, flow_point , fig)
 % das was wir als v density eingestellt haben
 densityV = cellfun(@(s) s.densityV, sims);
 
+%Achsenbeschriftung bestimmen
+timesteps = numel(sims{1}.CellsV(1,:,1));
+secInHour = 3600 / timesteps;
 % die tatsaechliche dichte (anzahl der autos / anzahl der zellen)
 %carsV = cellfun(@(s) s.numCarsV, sims);
 %act_densityV = carsV ./ numel(sims{1}.CellsV(:, 1, 2));
 
 
 % den fluss annaehern (die anzahl der autos, die den flow_point Ueberqueren)
-flowH = cellfun(@(s) calc_flow(s.CellsH, flow_point, s.numCarsH), sims);
-flowV = cellfun(@(s) calc_flow(s.CellsV, flow_point, s.numCarsV), sims);
+flowH = secInHour.*cellfun(@(s) calc_flow(s.CellsH, flow_point, s.numCarsH), sims);
+flowV = secInHour.*cellfun(@(s) calc_flow(s.CellsV, flow_point, s.numCarsV), sims);
 
 plot(fig, densityV, flowH, '-o', densityV, flowV, '-x')
-
+ylabel('Fzg/h')
+legend(fig, 'Horizontaler Fluss', 'Vertikaler Fluss')
 end
 
 function [flow] = calc_flow(Cells, flow_point, numCars)
