@@ -22,7 +22,7 @@ function varargout = gui(varargin)
 
 % Edit the above text to modify the response to help gui
 
-% Last Modified by GUIDE v2.5 16-Dec-2015 16:36:51
+% Last Modified by GUIDE v2.5 29-Dec-2015 18:42:35
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -72,6 +72,37 @@ function varargout = gui_OutputFcn(hObject, eventdata, handles)
 % Get default command line output from handles structure
 varargout{1} = handles.output;
 
+% --- get the densityV vector out of the gui
+function densityV = getDensityV(handles)
+densVStart=str2double(get(handles.BoxDichteVStart, 'String'));
+densVEnde=str2double(get(handles.BoxDichteVEnde, 'String'));
+densVWeite=str2double(get(handles.BoxDichteVWeite, 'String'));
+densityV=densVStart:densVWeite:densVEnde;
+
+% --- init the density / flowpoint slider
+function initSliders(handles, densityV, CellsH, crossingH)
+set(handles.slider1, 'Value', 1);
+set(handles.BoxDichteAnimation, 'String', densityV(1));
+set(handles.slider1, 'Min', 1);
+set(handles.slider1, 'Max', numel(densityV));
+
+set(handles.sliderFlowPoint, 'Value', crossingH);
+set(handles.BoxFlowPoint, 'String', crossingH);
+set(handles.sliderFlowPoint, 'Min', 1);
+set(handles.sliderFlowPoint, 'Max', numel(CellsH(:,1,1)));
+
+% --- plots the start of the animation with the density from the slider
+function plotStartCondition(handles)
+idx = floor(get(handles.slider1, 'Value'));
+sim = handles.sims{idx};
+plotCars2(sim.CellsH(:,1,:), sim.CellsV(:,1,:), handles.cellNum, handles.PlotKreuz);
+
+
+function resetButtons(handles)
+set(handles.ButtonStart, 'Enable', 'off');
+set(handles.ButtonRand, 'Enable', 'on');
+set(handles.PhillisPlotButton, 'Enable', 'off');
+set(handles.slider1, 'Enable', 'off');
 
 % --- Executes on button press in ButtonRand.
 function ButtonRand_Callback(hObject, eventdata, handles)
@@ -83,16 +114,11 @@ cellNum=str2double(get(handles.BoxLaengeAbschnitte, 'String'));
 pLinger=str2double(get(handles.BoxTroedeln, 'String'));
 vmax=str2double(get(handles.BoxMaxGeschwindigkeit, 'String'));
 densityH=str2double(get(handles.BoxDichteH, 'String'));
-densVStart=str2double(get(handles.BoxDichteVStart, 'String'));
-densVEnde=str2double(get(handles.BoxDichteVEnde, 'String'));
-densVWeite=str2double(get(handles.BoxDichteVWeite, 'String'));
-densityV=densVStart:densVWeite:densVEnde;
+densityV=getDensityV(handles);
 timesteps=str2double(get(handles.BoxZeitschritte, 'String'));
 
-set(handles.slider1, 'Value', 1);
-set(handles.slider1, 'Min', 1);
-set(handles.slider1, 'Max', numel(densityV));
-set(handles.BoxFlowPoint, 'String', cellNum+1);
+% Werte fuer die horizontale straße nur einmal initialisieren
+[CellsH, ObstaclesH, crossingH] = init_street(cellNum, 1, densityH, vmax, timesteps);
 
 sims = cell(numel(densityV), 1);
 for i  = 1:numel(densityV)
@@ -104,7 +130,6 @@ for i  = 1:numel(densityV)
     sim.densityH = densityH;
     
     %% horizontale straße
-    [CellsH, ObstaclesH, crossingH] = init_street(cellNum, 1, densityH, vmax, timesteps);
     sim.CellsH = CellsH;
     sim.ObstaclesH = ObstaclesH;
     sim.crossingH = crossingH;
@@ -129,33 +154,19 @@ end
 handles.sims = sims;
 handles.cellNum = cellNum;
 
-idx = floor(get(handles.slider1, 'Value'));
-sim = handles.sims{idx};
-plotCars2(sim.CellsH(:,1,:), sim.CellsV(:,1,:), handles.cellNum, handles.PlotKreuz);
+% initialize the slider values
+initSliders(handles, densityV, CellsH, crossingH);
+
+% plot the animation start condition
+plotStartCondition(handles);
 
 set(handles.ButtonStart, 'Enable', 'on');
 set(handles.ButtonRand, 'Enable', 'on');
-set(handles.PhillisPlotButton, 'Enable', 'on');
+set(handles.PhillisPlotButton, 'Enable', 'off');
+set(handles.slider1, 'Enable', 'on');
+set(handles.sliderFlowPoint, 'Enable', 'off');
 
 guidata(hObject,handles);
-
-
-% --- If Enable == 'on', executes on mouse press in 5 pixel border.
-% --- Otherwise, executes on mouse press in 5 pixel border or over ButtonRand.
-function ButtonRand_ButtonDownFcn(hObject, eventdata, handles)
-% hObject    handle to ButtonRand (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-
-
-function BoxDichteVStart_Callback(hObject, eventdata, handles)
-% hObject    handle to BoxDichteVStart (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of BoxDichteVStart as text
-%        str2double(get(hObject,'String')) returns contents of BoxDichteVStart as a double
 
 
 % --- Executes during object creation, after setting all properties.
@@ -171,16 +182,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-
-function BoxDichteH_Callback(hObject, eventdata, handles)
-% hObject    handle to BoxDichteH (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of BoxDichteH as text
-%        str2double(get(hObject,'String')) returns contents of BoxDichteH as a double
-
-
 % --- Executes during object creation, after setting all properties.
 function BoxDichteH_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to BoxDichteH (see GCBO)
@@ -194,16 +195,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-
-function BoxLaengeAbschnitte_Callback(hObject, eventdata, handles)
-% hObject    handle to BoxLaengeAbschnitte (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of BoxLaengeAbschnitte as text
-%        str2double(get(hObject,'String')) returns contents of BoxLaengeAbschnitte as a double
-
-
 % --- Executes during object creation, after setting all properties.
 function BoxLaengeAbschnitte_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to BoxLaengeAbschnitte (see GCBO)
@@ -215,16 +206,6 @@ function BoxLaengeAbschnitte_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-
-
-
-function BoxZeitschritte_Callback(hObject, eventdata, handles)
-% hObject    handle to BoxZeitschritte (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of BoxZeitschritte as text
-%        str2double(get(hObject,'String')) returns contents of BoxZeitschritte as a double
 
 
 % --- Executes during object creation, after setting all properties.
@@ -249,30 +230,27 @@ set(handles.ButtonStart, 'Enable', 'off');
 set(handles.ButtonStart, 'Backgroundcolor', 'red');
 set(handles.ButtonRand, 'Enable', 'off');
 set(handles.PhillisPlotButton, 'Enable', 'off');
+set(handles.slider1, 'Enable', 'off');
+set(handles.sliderFlowPoint, 'Enable', 'off');
 drawnow;
 
 for i=1:numel(handles.sims)
     handles.sims{i} = nagelschreckenberg(handles.sims{i});
 end
 
-set(handles.ButtonStart, 'Enable', 'on');
+set(handles.ButtonStart, 'Enable', 'off');
 set(handles.ButtonStart, 'Backgroundcolor', 'green');
 set(handles.PhillisPlotButton, 'Enable', 'on');
 set(handles.ButtonRand, 'Enable', 'on');
+set(handles.slider1, 'Enable', 'on');
+set(handles.sliderFlowPoint, 'Enable', 'on');
+
+% show density plot
+idx =  floor(get(handles.sliderFlowPoint, 'Value'));
+plotDensity(handles.sims, idx, handles.PlotDichte);
 
 guidata(hObject,handles);
 
-
-
-
-
-function BoxTroedeln_Callback(hObject, eventdata, handles)
-% hObject    handle to BoxTroedeln (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of BoxTroedeln as text
-%        str2double(get(hObject,'String')) returns contents of BoxTroedeln as a double
 
 
 % --- Executes during object creation, after setting all properties.
@@ -288,16 +266,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-
-function BoxMaxGeschwindigkeit_Callback(hObject, eventdata, handles)
-% hObject    handle to BoxMaxGeschwindigkeit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of BoxMaxGeschwindigkeit as text
-%        str2double(get(hObject,'String')) returns contents of BoxMaxGeschwindigkeit as a double
-
-
 % --- Executes during object creation, after setting all properties.
 function BoxMaxGeschwindigkeit_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to BoxMaxGeschwindigkeit (see GCBO)
@@ -311,16 +279,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-
-function BoxDichteVEnde_Callback(hObject, eventdata, handles)
-% hObject    handle to BoxDichteVEnde (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of BoxDichteVEnde as text
-%        str2double(get(hObject,'String')) returns contents of BoxDichteVEnde as a double
-
-
 % --- Executes during object creation, after setting all properties.
 function BoxDichteVEnde_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to BoxDichteVEnde (see GCBO)
@@ -332,16 +290,6 @@ function BoxDichteVEnde_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-
-
-
-function BoxDichteVWeite_Callback(hObject, eventdata, handles)
-% hObject    handle to BoxDichteVWeite (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of BoxDichteVWeite as text
-%        str2double(get(hObject,'String')) returns contents of BoxDichteVWeite as a double
 
 
 % --- Executes during object creation, after setting all properties.
@@ -368,8 +316,9 @@ function slider1_Callback(hObject, eventdata, handles)
 
 idx =  floor(get(handles.slider1, 'Value'));
 sim = handles.sims{idx};
-
 set(handles.BoxDichteAnimation, 'String', sim.densityV);
+
+plotStartCondition(handles);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -384,16 +333,6 @@ if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColo
 end
 
 
-
-function BoxDichteAnimation_Callback(hObject, eventdata, handles)
-% hObject    handle to BoxDichteAnimation (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of BoxDichteAnimation as text
-%        str2double(get(hObject,'String')) returns contents of BoxDichteAnimation as a double
-
-
 % --- Executes during object creation, after setting all properties.
 function BoxDichteAnimation_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to BoxDichteAnimation (see GCBO)
@@ -405,16 +344,6 @@ function BoxDichteAnimation_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-
-
-
-function BoxFlowPoint_Callback(hObject, eventdata, handles)
-% hObject    handle to BoxFlowPoint (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of BoxFlowPoint as text
-%        str2double(get(hObject,'String')) returns contents of BoxFlowPoint as a double
 
 
 % --- Executes during object creation, after setting all properties.
@@ -436,13 +365,115 @@ function PhillisPlotButton_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-plotDensity(handles.sims, str2double(get(handles.BoxFlowPoint, 'String')), handles.PlotDichte);
-
 idx = floor(get(handles.slider1, 'Value'));
 sim = handles.sims{idx};
 plotCars2(sim.CellsH, sim.CellsV, handles.cellNum, handles.PlotKreuz);
 
-set(handles.ButtonStart, 'Enable', 'on');
-set(handles.PhillisPlotButton, 'Backgroundcolor', 'green');
+set(handles.ButtonStart, 'Enable', 'off');
 set(handles.PhillisPlotButton, 'Enable', 'on');
 set(handles.ButtonRand, 'Enable', 'on');
+
+
+% --- Executes on key press with focus on BoxDichteVStart and none of its controls.
+function BoxDichteVStart_KeyPressFcn(hObject, eventdata, handles)
+% hObject    handle to BoxDichteVStart (see GCBO)
+% eventdata  structure with the following fields (see UICONTROL)
+%	Key: name of the key that was pressed, in lower case
+%	Character: character interpretation of the key(s) that was pressed
+%	Modifier: name(s) of the modifier key(s) (i.e., control, shift) pressed
+% handles    structure with handles and user data (see GUIDATA)
+resetButtons(handles);
+
+% --- Executes on key press with focus on BoxDichteVEnde and none of its controls.
+function BoxDichteVEnde_KeyPressFcn(hObject, eventdata, handles)
+% hObject    handle to BoxDichteVEnde (see GCBO)
+% eventdata  structure with the following fields (see UICONTROL)
+%	Key: name of the key that was pressed, in lower case
+%	Character: character interpretation of the key(s) that was pressed
+%	Modifier: name(s) of the modifier key(s) (i.e., control, shift) pressed
+% handles    structure with handles and user data (see GUIDATA)
+resetButtons(handles);
+
+% --- Executes on key press with focus on BoxDichteVWeite and none of its controls.
+function BoxDichteVWeite_KeyPressFcn(hObject, eventdata, handles)
+% hObject    handle to BoxDichteVWeite (see GCBO)
+% eventdata  structure with the following fields (see UICONTROL)
+%	Key: name of the key that was pressed, in lower case
+%	Character: character interpretation of the key(s) that was pressed
+%	Modifier: name(s) of the modifier key(s) (i.e., control, shift) pressed
+% handles    structure with handles and user data (see GUIDATA)
+resetButtons(handles);
+
+% --- Executes on key press with focus on BoxDichteH and none of its controls.
+function BoxDichteH_KeyPressFcn(hObject, eventdata, handles)
+% hObject    handle to BoxDichteH (see GCBO)
+% eventdata  structure with the following fields (see UICONTROL)
+%	Key: name of the key that was pressed, in lower case
+%	Character: character interpretation of the key(s) that was pressed
+%	Modifier: name(s) of the modifier key(s) (i.e., control, shift) pressed
+% handles    structure with handles and user data (see GUIDATA)
+resetButtons(handles);
+
+% --- Executes on key press with focus on BoxTroedeln and none of its controls.
+function BoxTroedeln_KeyPressFcn(hObject, eventdata, handles)
+% hObject    handle to BoxTroedeln (see GCBO)
+% eventdata  structure with the following fields (see UICONTROL)
+%	Key: name of the key that was pressed, in lower case
+%	Character: character interpretation of the key(s) that was pressed
+%	Modifier: name(s) of the modifier key(s) (i.e., control, shift) pressed
+% handles    structure with handles and user data (see GUIDATA)
+resetButtons(handles);
+
+% --- Executes on key press with focus on BoxMaxGeschwindigkeit and none of its controls.
+function BoxMaxGeschwindigkeit_KeyPressFcn(hObject, eventdata, handles)
+% hObject    handle to BoxMaxGeschwindigkeit (see GCBO)
+% eventdata  structure with the following fields (see UICONTROL)
+%	Key: name of the key that was pressed, in lower case
+%	Character: character interpretation of the key(s) that was pressed
+%	Modifier: name(s) of the modifier key(s) (i.e., control, shift) pressed
+% handles    structure with handles and user data (see GUIDATA)
+resetButtons(handles);
+
+% --- Executes on key press with focus on BoxLaengeAbschnitte and none of its controls.
+function BoxLaengeAbschnitte_KeyPressFcn(hObject, eventdata, handles)
+% hObject    handle to BoxLaengeAbschnitte (see GCBO)
+% eventdata  structure with the following fields (see UICONTROL)
+%	Key: name of the key that was pressed, in lower case
+%	Character: character interpretation of the key(s) that was pressed
+%	Modifier: name(s) of the modifier key(s) (i.e., control, shift) pressed
+% handles    structure with handles and user data (see GUIDATA)
+resetButtons(handles);
+
+% --- Executes on key press with focus on BoxZeitschritte and none of its controls.
+function BoxZeitschritte_KeyPressFcn(hObject, eventdata, handles)
+% hObject    handle to BoxZeitschritte (see GCBO)
+% eventdata  structure with the following fields (see UICONTROL)
+%	Key: name of the key that was pressed, in lower case
+%	Character: character interpretation of the key(s) that was pressed
+%	Modifier: name(s) of the modifier key(s) (i.e., control, shift) pressed
+% handles    structure with handles and user data (see GUIDATA)
+resetButtons(handles);
+
+
+% --- Executes on slider movement.
+function sliderFlowPoint_Callback(hObject, eventdata, handles)
+% hObject    handle to sliderFlowPoint (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'Value') returns position of slider
+%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+idx =  floor(get(handles.sliderFlowPoint, 'Value'));
+set(handles.BoxFlowPoint, 'String', idx);
+plotDensity(handles.sims, idx, handles.PlotDichte);
+
+% --- Executes during object creation, after setting all properties.
+function sliderFlowPoint_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to sliderFlowPoint (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: slider controls usually have a light gray background.
+if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor',[.9 .9 .9]);
+end
