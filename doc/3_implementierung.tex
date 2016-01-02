@@ -13,14 +13,35 @@ war, auf Schleifen zu verzichten und stattdessen die in Matlab sehr effizient
 umgesetzten Matrixoperationen zu benutzen. Dies bedeutet vor allem, dass als 
 grundlegende Datenstruktur Matrizen zu benutzen sind. 
 
-Es besteht eine Kreuzung aus zwei Straßen, welche zur Vereinfachung als Horizontale und Vertikale
-bezeichnet werden. Beide Straßen haben den den Kreuzungspunkt als gemeinsamen Straßenabschnitt. Dieser
-wird zweimal, in der Horizontalen und in der Vertikalen, abgespeichert.
+\subsection{Kreuzung, Straße und Auto}
+Eine Kreuzung besteht aus zwei Straßen, welche zur Vereinfachung als Horizontale und Vertikale
+bezeichnet werden. Beide Straßen haben den Kreuzungspunkt als gemeinsamen Straßenabschnitt. Dieser
+wird zweimal, in der Horizontalen und in der Vertikalen, abgespeichert. 
 
-Eine Straße wird durch zwei Matrizen \(S^{1}, S^{2}\) repräsentiert. 
+Weiter muss die Verkehrssitation für jeden Zeitpunkt abgespeichert werden und
+es soll möglich sein Hinderenisse einzubauen, an dennen Autos langsam vorbei Fahren müssen, 
+wie z.B. Baustellen oder eben die Kreuzung selbst. 
+Für eine Straße werden demnach die folgenden Daten benötigt:
+\begin{enumerate}
+  \item Anzahl der Zellen \(N \in \mathbb{N}\)
+  \item Anzahl der Zeitschritte die Simuliert werden \(T \in \mathbb{N}\)
+  \item Koordinate des Kreuzungspunktes \(c \in \{ 1, \ldots N \}\)
+  \item Koordinaten der Hindernisse \(o_i \in \mathbb{N}, \; i = 1, \ldots l\)
+\end{enumerate}
+Die Koordinaten entsprechen dabei den Zellennummern. Insbesondere ist eine Kreuzung ein spezielles Hinderniss. 
+Was noch fehlt sind die Fahrzeuge selbst. Diese werden zu einem festen Zeitschritt beschrieben druch:
+\begin{enumerate}
+  \item Autonummer \(k \in \{ 1, \ldots, K \}, \; K \leq N\) 
+  \item Geschwindigkeit \(v_k \in \{0, \ldots, v_{max} \}\)
+  \item Position, d.h. Straße und Zellenkoordinate
+\end{enumerate}
+Dabei ist die Autonummer nur innerhalb einer Straße eindeutig. Dies ist ausreichend, da die Fahrzeuge nicht 
+abbiegen, d.h. eine Straße nicht verlassen.
+
+Insgesamt wird eine Straße durch zwei \(T \times N\)-Matrizen \(S^1, S^{2}\) beschrieben.
 Die \(t\)-te Zeile dieser Matrizen stellt die Situation zur Zeit \(t\) (mit \(1 \leq t \leq T\)) dar, 
 wobei die Spalten den Zellen entsprechen in denen ein Auto stehen kann. 
 Steht also zur Zeit \(t\) das Auto mit Nummer \(k\) (\(1 \leq k \leq K\)) und Geschwindigkeit \(v_k\) in der \(n\)-ten Zelle, 
 so so gilt \( S^{2}_{t, n} = k\) und \(S^{1}_{t, n} = v_k\). 
 Ist andererseits zur Zeit \(t\) die \(n\)-te Zelle nicht belegt so gilt: \(S^2_{t, n} = 0 = S^1_{t, n}\).
-Kurz gesagt \(S^{1}\) die Geschwindigkeiten und \(S^{2}\) die Autonummern zu jeder stelle und jedem Zeitpunkt.
+Kurz gesagt \(S^{1}\) speichert die Geschwindigkeiten und \(S^{2}\) die Autonummern zu jeder Stelle und jedem Zeitpunkt.
