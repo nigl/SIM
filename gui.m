@@ -22,7 +22,7 @@ function varargout = gui(varargin)
 
 % Edit the above text to modify the response to help gui
 
-% Last Modified by GUIDE v2.5 29-Dec-2015 18:42:35
+% Last Modified by GUIDE v2.5 04-Jan-2016 15:55:23
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -59,7 +59,7 @@ handles.output = hObject;
 guidata(hObject, handles);
 
 % UIWAIT makes gui wait for user response (see UIRESUME)
-% uiwait(handles.figure1);
+% uiwait(handles.PlotG);
 
 
 % --- Outputs from this function are returned to the command line.
@@ -96,6 +96,12 @@ function plotStartCondition(handles)
 idx = floor(get(handles.slider1, 'Value'));
 sim = handles.sims{idx};
 plotCars2(sim.CellsH(:,1,:), sim.CellsV(:,1,:), handles.cellNum, handles.PlotKreuz);
+%show hoehendiagramm
+plotAll(sim.CellsH, handles.PlotAllH);
+xlabel(handles.PlotAllH, 'horizontale Straﬂe')
+plotAll(sim.CellsV, handles.PlotAllV);
+xlabel(handles.PlotAllV, 'vertikale Straﬂe')
+
 
 
 function resetButtons(handles)
@@ -245,9 +251,16 @@ set(handles.ButtonRand, 'Enable', 'on');
 set(handles.slider1, 'Enable', 'on');
 set(handles.sliderFlowPoint, 'Enable', 'on');
 
+%plots aktualisieren
+plotStartCondition(handles);
+
 % show density plot
 idx =  floor(get(handles.sliderFlowPoint, 'Value'));
 plotDensity(handles.sims, idx, handles.PlotDichte);
+
+% show speed plot 
+plotSpeed(handles.sims, handles.PlotG);
+
 
 guidata(hObject,handles);
 
@@ -367,6 +380,13 @@ function PhillisPlotButton_Callback(hObject, eventdata, handles)
 
 idx = floor(get(handles.slider1, 'Value'));
 sim = handles.sims{idx};
+%show hoehendiagramm
+plotAll(sim.CellsH, handles.PlotAllH);
+xlabel(handles.PlotAllH, 'horizontale Straﬂe')
+plotAll(sim.CellsV, handles.PlotAllV);
+xlabel(handles.PlotAllV, 'vertikale Straﬂe')
+
+%start animation
 plotCars2(sim.CellsH, sim.CellsV, handles.cellNum, handles.PlotKreuz);
 
 set(handles.ButtonStart, 'Enable', 'off');
