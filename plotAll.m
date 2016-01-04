@@ -1,7 +1,7 @@
-function [] = plotAll(Cells)
+function [] = plotAll(Cells, fig)
   %function plotCarsAll plottet die Autos über die Zeit
     CellsNumber = (size(Cells,1)-1)/2;
-    position = (-CellsNumber:CellsNumber);
+    position = (0:2*CellsNumber+1);
     
     for t=1:size(Cells,2)
         
@@ -22,9 +22,8 @@ function [] = plotAll(Cells)
     
     end
     %Plot
-    figure();
-    scatter(X, Y,[], Z, 'filled');
- 
+    scatter(fig, X, Y,[], Z, 'filled');
+    ylabel(fig, 'Zeit')
 end
 
 

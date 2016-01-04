@@ -1,4 +1,4 @@
-function plotSpeed(sims, fig)
+function plotSpeed(sims,fig)
 %PLOTSPEED Plot des Dichte-Geschwindigkeitsdiagrammes
 
 % das was wir als v density eingestellt haben
@@ -16,11 +16,11 @@ timeSteps = numel(sims{1}.CellsV(1,:,1));
 aveSpeedV = cellfun(@(s) aveSpeed(s.CellsV, timeSteps, s.numCarsV), sims);
 
 aveSpeedH = cellfun(@(s) aveSpeed(s.CellsH, timeSteps, s.numCarsH), sims);
-figure(fig)
-plot( actDensityV, aveSpeedH, '.r', actDensityV, aveSpeedV, '.b', 'MarkerSize', 16)
-xlabel('vertikale Dichte')
-ylabel('Fzg/h')
-legend('Durschnittsgesch. horizontal', 'Durschnittsgesch. vertikal')
+
+plot(fig, actDensityV, aveSpeedH, '.r', actDensityV, aveSpeedV, '.b', 'MarkerSize', 16)
+xlabel(fig, 'vertikale Dichte')
+ylabel(fig, 'Fzg/h')
+legend(fig, 'Durschnittsgesch. horizontal', 'Durschnittsgesch. vertikal')
 end
 
 function [speed] = aveSpeed(Cells, timeSteps, numCars)
