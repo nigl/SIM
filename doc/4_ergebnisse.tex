@@ -1,8 +1,4 @@
 \chapter{Validierung}
-TODO bildchen uns zeug (Plot des fundamental diagramms für
-verschiedene dichteeinstellungen etc...)
-
-TODO Plots im CipPool fertigen 
 
 Für jede Simulation ist von großer Bedeutung, wie weit Ergebnisse mit der Realität übereinstimmen, deshalb möchten wir dies im folgenden Abschnitt näher untersuchen. Dabei wollen wir auf zwei mögliche Fehlerursachen eingehen, zum einen die Richtigkeit der Modellierung und zum Anderen die Umsetzung der Implementierung. 
 
@@ -32,9 +28,13 @@ Zunächst konnten wir unsere Ergebnisse mit den Resultaten aus \cite{book:bungar
 \label{pic:FD_Vergleich}%
 \end{figure}
 
+Ein weiteres visuelles Tool zur Darstellung unserer Simulation, sind die Zellen-Zeit-Diagrammen. Hierbei wird für jedes Auto zu jedem Zeitschritt die Position in einem Koordinatensystem dargestellt. Zwei solche Diagramme sind in in Abbildung \ref{pic:ZelleZeit} dargestellt. Somit kann mithilfe eines Bildes die gesamte Simulation visualisiert werden. Dadurch können auch Fehler sofort entdeckt werden, und die Simulation auf ihre Richtigkeit überprüft werden. 
 
+\begin{figure}%
+\centering
+\includegraphics[width=15cm]{4_ZelleZeit.png}%
+\caption{Links: Das Zellen-Zeit-Diagramm für die vertikale Ringstraße mit Dichte $\rho_v = 0.11$. Rechts: Analog die dazugehörige horizontale Straße mit Dichte $\rho_h=0.12$. Gemeinsame Trödeldichte ist $0.2$ und die gesamte Straßenlänge beider Ringstraßen ist $300$ Zellen, die Kreuzung befindet sich an der Stelle 150.  }%
+\label{pic:ZelleZeit}%
+\end{figure}
 
-
-
-Maybe TODO Erklären warum Stauwellen immer gleiche Signalgeschwindigkeit haben, siehe Bungartz Seite 178
-
+In unseren Zellen-Zeit-Diagrammen besitzt jedes Auto eine eigene Farbe, so kann man schnell die Trajektorie eines Fahrzeugs ablesen. Auch würden so unnatürliches Verhalten der Autos sofort erkannt werden. Schön zu sehen ist das Verhalten der Autos nahe der Kreuzung. Bei der vertikalen Straße bremsen die Autos kurz vor der Kreuzung ab, fahren aber dann relativ zügig über die Kreuzung. Dagegen wird bei der horizontalen Straße meist schon früher abgebremst, da sich ein Rückstau aufgrund der Rechts vor Links Regel ergibt. So kann es passieren, dass Autos über viele Zeitschritte auf eine Weiterfahrt warten müssen. Diese Wartezeit ist, wie auch zu erwarten ist, von der Dichte der vertikalen Straße abhängig. Somit verhalten sich die Ergebnisse unsere Simulation genauso, wie man vermutet hätte. Dies bestärkt unsere Annahme, dass unsere Simulation richtig ist.  
