@@ -15,10 +15,11 @@ secInHour = 3600 / timesteps;
 flowH = secInHour.*cellfun(@(s) calc_flow(s.CellsH, flow_point, s.numCarsH), sims);
 flowV = secInHour.*cellfun(@(s) calc_flow(s.CellsV, flow_point, s.numCarsV), sims);
 
-plot(fig, actDensityV, flowH, '.r', actDensityV, flowV, '.b', 'MarkerSize', 16)
+flowT= flowH+flowV;
+plot(fig, actDensityV, flowT, '.',actDensityV, flowH, '.r', actDensityV, flowV, '.b', 'MarkerSize', 16)
 ylabel(fig, 'Fzg/h')
 xlabel(fig, 'vertikale Dichte')
-legend(fig, 'Horizontaler Fluss', 'Vertikaler Fluss')
+legend(fig, 'Gesamter Fluss', 'Horizontaler Fluss', 'Vertikaler Fluss')
 
 end
 
