@@ -28,7 +28,7 @@ Für eine Straße werden demnach die folgenden Daten benötigt:
   \item Koordinate des Kreuzungspunktes \(c \in \{ 1, \ldots N \}\)
   \item Koordinaten der Hindernisse \(o_i \in \mathbb{N}, \; i = 1, \ldots l\)
 \end{enumerate}
-Die Koordinaten entsprechen dabei den Zellennummern. Insbesondere ist eine Kreuzung ein spezielles Hinderniss,
+Die Koordinaten entsprechen dabei den Zellennummern (von links nach rechts, bzw. unten nach oben vortlaufend durchnummeriert). Insbesondere ist eine Kreuzung ein spezielles Hinderniss,
 so dass sich Autos langsam dieser nähern. 
 Was noch fehlt sind die Fahrzeuge selbst. Diese werden zu einem festen Zeitschritt beschrieben druch:
 \begin{enumerate}
@@ -42,17 +42,32 @@ abbiegen, d.h. eine Straße nicht verlassen.
 Insgesamt wird eine Straße durch zwei \(T \times N\)-Matrizen \(V, W\) beschrieben.
 Die \(t\)-te Zeile dieser Matrizen stellt die Situation zur Zeit \(t\) (mit \(1 \leq t \leq T\)) dar, 
 wobei die Spalten den Zellen entsprechen in denen ein Auto stehen kann. 
-
 Steht also zur Zeit \(t\) das Auto mit Nummer \(k\) (mit \(1 \leq k \leq K\)) und Geschwindigkeit \(v_k\) in der \(n\)-ten Zelle, 
 so so gilt \( W_{t, n} = k\) und \(V_{t, n} = v_k\). 
-
 Ist andererseits zur Zeit \(t\) die \(n\)-te Zelle nicht belegt so gilt: \(W_{t, n} = 0 = V_{t, n}\).
 Kurz gesagt \(V\) speichert die Geschwindigkeiten und \(W\) die Autonummern zu jeder Stelle und jedem Zeitpunkt.
 
-Zu Beginn der ist nur die jeweils erste Zeile, d.h. der erste Zeitschritt, initialisiert die anderen Matrixeinträge
-werden mit Null vorbelegt. Dabei werden die Autos mit zufälliger Position und Geschwindigkeit vorinitialisiert, gemäß
-einer eingestellten dichte. Dies erledigt die Funktion init\_street.m .
+Zu Beginn ist nur die jeweils erste Zeile, d.h. der erste Zeitschritt, initialisiert und die anderen Matrixeinträge
+werden mit Null vorbelegt. Dabei werden die Autos mit zufälliger Position und Geschwindigkeit gemäß
+einer eingestellten Dichte \(\rho\) gesetzt. Dies erledigt die Funktion \code{init\_street.m}:
+\begin{enumerate}
+  \item Übergabeparameter
+    \begin{enumerate}
+      \item Anzahl der Zellen bis zur Kreuzung \(n\) 
+      \item Verkehrsdichte \(\rho\)
+      \item Simulationsdauer \(T\)
+      \item Höchstgeschwindigkeit \(v_{max}\) 
+    \end{enumerate}
+  \item Rückgabewerte
+    \begin{enumerate}
+      \item Koordinate der Kreuzung \(c\) 
+      \item Vorinitialisierte Geschwindigkeitsmatrix \(V\) von Dimension \(T \times N\) \\ mit \(N := 2n+1\)
+      \item Vorinitialisierte Autonummernmatrix \(W\) von Dimension \(T \times N\) 
+      \item Hindernissvektor \(o\) Vektor mit Dimension \(N\) (\(o_i \neq 0\) falls in Zelle \(i\) ein
+        Hinderniss steht und \(o_i = 0\) sonst)
+    \end{enumerate}
+\end{iterate}
 
 Es stellt sich die Frage, ob man auch mit einer Matrix auskommt. Eine Möglichkeit besteht darin sich nur die Geschwindigkeitsmatrix 
 zu speichern und freie Straßenabschnitte mit \(-1\) zu kodieren. Dann ist es jedoch nicht ohne Weiteres möglich den Zustand eines bestimmten Autos über
-mehrere Zeitschritte hinweg zu verfolgen.
+mehrere Zeitschritte hinweg zu verfolgen, vorallem wenn zukünftige Erweiterungen beispielsweise Überholmanöver der Autos erlauben sollen.
