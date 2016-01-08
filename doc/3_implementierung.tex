@@ -28,7 +28,8 @@ Für eine Straße werden demnach die folgenden Daten benötigt:
   \item Koordinate des Kreuzungspunktes \(c \in \{ 1, \ldots N \}\)
   \item Koordinaten der Hindernisse \(o_i \in \mathbb{N}, \; i = 1, \ldots l\)
 \end{enumerate}
-Die Koordinaten entsprechen dabei den Zellennummern. Insbesondere ist eine Kreuzung ein spezielles Hinderniss. 
+Die Koordinaten entsprechen dabei den Zellennummern. Insbesondere ist eine Kreuzung ein spezielles Hinderniss,
+so dass sich Autos langsam dieser nähern. 
 Was noch fehlt sind die Fahrzeuge selbst. Diese werden zu einem festen Zeitschritt beschrieben druch:
 \begin{enumerate}
   \item Autonummer \(k \in \{ 1, \ldots, K \}, \; K \leq N\) 
@@ -38,13 +39,19 @@ Was noch fehlt sind die Fahrzeuge selbst. Diese werden zu einem festen Zeitschri
 Dabei ist die Autonummer nur innerhalb einer Straße eindeutig. Dies ist ausreichend, da die Fahrzeuge nicht 
 abbiegen, d.h. eine Straße nicht verlassen.
 
-Insgesamt wird eine Straße durch zwei \(T \times N\)-Matrizen \(S^1, S^{2}\) beschrieben.
+Insgesamt wird eine Straße durch zwei \(T \times N\)-Matrizen \(V, W\) beschrieben.
 Die \(t\)-te Zeile dieser Matrizen stellt die Situation zur Zeit \(t\) (mit \(1 \leq t \leq T\)) dar, 
 wobei die Spalten den Zellen entsprechen in denen ein Auto stehen kann. 
-Steht also zur Zeit \(t\) das Auto mit Nummer \(k\) (\(1 \leq k \leq K\)) und Geschwindigkeit \(v_k\) in der \(n\)-ten Zelle, 
-so so gilt \( S^{2}_{t, n} = k\) und \(S^{1}_{t, n} = v_k\). 
-Ist andererseits zur Zeit \(t\) die \(n\)-te Zelle nicht belegt so gilt: \(S^2_{t, n} = 0 = S^1_{t, n}\).
-Kurz gesagt \(S^{1}\) speichert die Geschwindigkeiten und \(S^{2}\) die Autonummern zu jeder Stelle und jedem Zeitpunkt.
+
+Steht also zur Zeit \(t\) das Auto mit Nummer \(k\) (mit \(1 \leq k \leq K\)) und Geschwindigkeit \(v_k\) in der \(n\)-ten Zelle, 
+so so gilt \( W_{t, n} = k\) und \(V_{t, n} = v_k\). 
+
+Ist andererseits zur Zeit \(t\) die \(n\)-te Zelle nicht belegt so gilt: \(W_{t, n} = 0 = V_{t, n}\).
+Kurz gesagt \(V\) speichert die Geschwindigkeiten und \(W\) die Autonummern zu jeder Stelle und jedem Zeitpunkt.
+
+Zu Beginn der ist nur die jeweils erste Zeile, d.h. der erste Zeitschritt, initialisiert die anderen Matrixeinträge
+werden mit Null vorbelegt. Dabei werden die Autos mit zufälliger Position und Geschwindigkeit vorinitialisiert, gemäß
+einer eingestellten dichte. Dies erledigt die Funktion init\_street.m .
 
 Es stellt sich die Frage, ob man auch mit einer Matrix auskommt. Eine Möglichkeit besteht darin sich nur die Geschwindigkeitsmatrix 
 zu speichern und freie Straßenabschnitte mit \(-1\) zu kodieren. Dann ist es jedoch nicht ohne Weiteres möglich den Zustand eines bestimmten Autos über
