@@ -45,3 +45,7 @@ Steht also zur Zeit \(t\) das Auto mit Nummer \(k\) (\(1 \leq k \leq K\)) und Ge
 so so gilt \( S^{2}_{t, n} = k\) und \(S^{1}_{t, n} = v_k\). 
 Ist andererseits zur Zeit \(t\) die \(n\)-te Zelle nicht belegt so gilt: \(S^2_{t, n} = 0 = S^1_{t, n}\).
 Kurz gesagt \(S^{1}\) speichert die Geschwindigkeiten und \(S^{2}\) die Autonummern zu jeder Stelle und jedem Zeitpunkt.
+
+Es stellt sich die Frage, ob man auch mit einer Matrix auskommt. Eine Möglichkeit besteht darin sich nur die Geschwindigkeitsmatrix 
+zu speichern und freie Straßenabschnitte mit \(-1\) zu kodieren. Dann ist es jedoch nicht ohne Weiteres möglich den Zustand eines bestimmten Autos über
+mehrere Zeitschritte hinweg zu verfolgen.
