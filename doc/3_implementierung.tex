@@ -13,24 +13,19 @@ war, auf Schleifen zu verzichten und stattdessen die in Matlab sehr effizient
 umgesetzten Matrixoperationen zu benutzen. Dies bedeutet vor allem, dass als 
 grundlegende Datenstruktur Matrizen zu benutzen sind. 
 
-\subsection{Kreuzung, Straße und Auto}
+\subsection{Die Daten: Kreuzung, Straße und Auto}
 Eine Kreuzung besteht aus zwei Straßen, welche zur Vereinfachung als Horizontale und Vertikale
 bezeichnet werden. Beide Straßen haben den Kreuzungspunkt als gemeinsamen Straßenabschnitt. Dieser
 wird zweimal, in der Horizontalen und in der Vertikalen, abgespeichert. 
-
 Weiter muss die Verkehrssitation für jeden Zeitpunkt abgespeichert werden und
-es soll möglich sein Hinderenisse einzubauen, an dennen Autos langsam vorbei Fahren müssen, 
-wie z.B. Baustellen oder eben die Kreuzung selbst. 
+es sollen Autos langsam an den Kreuzungspunkt heranfahren. 
 Für eine Straße werden demnach die folgenden Daten benötigt:
 \begin{enumerate}
   \item Anzahl der Zellen \(N \in \mathbb{N}\)
   \item Anzahl der Zeitschritte die Simuliert werden \(T \in \mathbb{N}\)
   \item Koordinate des Kreuzungspunktes \(c \in \{ 1, \ldots N \}\)
-  \item Koordinaten der Hindernisse \(o_i \in \mathbb{N}, \; i = 1, \ldots l\)
 \end{enumerate}
-Die Koordinaten entsprechen dabei den Zellennummern (von links nach rechts, bzw. unten nach oben vortlaufend durchnummeriert). Insbesondere ist eine Kreuzung ein spezielles Hinderniss,
-so dass sich Autos langsam dieser nähern. 
-Was noch fehlt sind die Fahrzeuge selbst. Diese werden zu einem festen Zeitschritt beschrieben druch:
+Die Koordinaten entsprechen dabei den Zellennummern (von links nach rechts, bzw. unten nach oben vortlaufend durchnummeriert). Was noch fehlt sind die Fahrzeuge selbst. Diese werden zu einem festen Zeitschritt beschrieben druch:
 \begin{enumerate}
   \item Autonummer \(k \in \{ 1, \ldots, K \}, \; K \leq N\) 
   \item Geschwindigkeit \(v_k \in \{0, \ldots, v_{max} \}\)
@@ -48,8 +43,11 @@ Ist andererseits zur Zeit \(t\) die \(n\)-te Zelle nicht belegt so gilt: \(W_{t,
 Kurz gesagt \(V\) speichert die Geschwindigkeiten und \(W\) die Autonummern zu jeder Stelle und jedem Zeitpunkt.
 
 Zu Beginn ist nur die jeweils erste Zeile, d.h. der erste Zeitschritt, initialisiert und die anderen Matrixeinträge
-werden mit Null vorbelegt. Dabei werden die Autos mit zufälliger Position und Geschwindigkeit gemäß
-einer eingestellten Dichte \(\rho\) gesetzt. Dies erledigt die Funktion \code{init\_street.m}:
+sind mit Null vorbelegt. Dabei werden die Autos mit zufälliger Position und Geschwindigkeit gemäß
+einer eingestellten Dichte \(\rho\) gesetzt. Dies erledigt die Funktion \code{init\_street.m} \footnote{Die tatsächliche 
+Implementierung ist etwas allgemeiner. So können beispielsweise mehrere Kreuzungen und auch andere
+Hindernisse eingebaut werden, an dennen Autos nur mit Geschwindigkeit \(1\) vorbeifahren können. Der Rest des Programms 
+beschränkt sich jedoch auf den Spezialfall einer Kreuzung.}:
 \begin{enumerate}
   \item Übergabeparameter
     \begin{enumerate}
@@ -61,13 +59,91 @@ einer eingestellten Dichte \(\rho\) gesetzt. Dies erledigt die Funktion \code{in
   \item Rückgabewerte
     \begin{enumerate}
       \item Koordinate der Kreuzung \(c\) 
-      \item Vorinitialisierte Geschwindigkeitsmatrix \(V\) von Dimension \(T \times N\) \\ mit \(N := 2n+1\)
-      \item Vorinitialisierte Autonummernmatrix \(W\) von Dimension \(T \times N\) 
-      \item Hindernissvektor \(o\) Vektor mit Dimension \(N\) (\(o_i \neq 0\) falls in Zelle \(i\) ein
-        Hinderniss steht und \(o_i = 0\) sonst)
+      \item Geschwindigkeitsmatrix \(V\) von Dimension \(T \times N\) \\ mit \(N := 2n+1\)
+      \item Autonummernmatrix \(W\) von Dimension \(T \times N\) 
     \end{enumerate}
-\end{iterate}
-
+\end{enumerate}
+Die Erzeugte Straße ist also \(2n+1\) Zellen lang und der Kreuzungspunkt befindet sich  in der Mitte, d.h. an der 
+Koordinate \(c = n+1\). Im weiteren Programmverlauf wird jedoch nur der Rückgabewert \(c\) ausgwertet, so dass die Kreuzung
+leicht verschoben werden kann. Hier ein Beispiel für \(n=2\) und \(T=2\):
+\[
+  V = 
+  \begin{bmatrix}
+    v_1& 0& 0& v_2& v_3 \\
+    0& 0& 0& 0& 0
+  \end{bmatrix}, \;
+  W = 
+  \begin{bmatrix}
+    1& 0& 0& 2& 3 \\
+    0& 0& 0& 0& 0
+  \end{bmatrix}, \;
+  c = 3
+\]
 Es stellt sich die Frage, ob man auch mit einer Matrix auskommt. Eine Möglichkeit besteht darin sich nur die Geschwindigkeitsmatrix 
 zu speichern und freie Straßenabschnitte mit \(-1\) zu kodieren. Dann ist es jedoch nicht ohne Weiteres möglich den Zustand eines bestimmten Autos über
 mehrere Zeitschritte hinweg zu verfolgen, vorallem wenn zukünftige Erweiterungen beispielsweise Überholmanöver der Autos erlauben sollen.
+
+\subsection{Der Algorithmus: Beschleunigen, Bremsen und Trödeln}
+Wir betrachten zunächst die Vertikale und die Horizontale getrennt, d.h. das Folgende wird
+auf beide Straßen angewendet.
+
+Um den nächsten Zeitschritt berechnen zu können muss man zunächst für jedes Auto wissen, wie viele freie Zellen 
+in Fahrtrichtung vorhanden sind. Dabei reicht es \(v_{max}\) Zellen vorauszuschauen. 
+Eine Zelle ist genau dann nicht frei, wenn sie ein Auto beinhaltet oder
+die Kreuzungszelle ist. Hierfür wurde die Funktion \code{freeCells.m} geschrieben:
+\begin{enumerate}
+  \item Übergabeparameter
+    \begin{enumerate}
+      \item Straßenbelegung \(w_t\) zum Zeitpunkt \(t\),  also die Zeile \(t\) der Matrix \(W\)       
+      \item Koordinate der Kreuzung \(c\) 
+      \item Maximale Geschindigkeit \(v_{max}\)
+    \end{enumerate}
+  \item Rückgabewerte
+    \begin{enumerate}
+      \item Vektor \(u\) der Länge \(N\) mit \(u_i \in \{0, \ldots, v_{max} \}\) ist Anzahl der freien 
+        Zellen in Fahrtrichtung ab Zelle \(i\), also \(j := i + u_i + 1 \Rightarrow W_{t,j} \neq 0 \lor j = c\).
+    \end{enumerate}
+\end{enumerate}
+Nun kann entsprechend Gebremst oder Beschleunigt werden. So wird für alle mit Autos belegten Zellen \(i\)
+die neue Geschwindigkeit auf \(u_i\) gesetzt falls \(u_i < v\) und auf \(v\) falls \(u_i \geq v\) mit
+\( v := \min\{ v_{max}, V_{t,i}+1 \}\).  
+Dafür wurde die Funktion \code{adjustSpeed.m} geschaffen, die intern \code{freeCells.m} benutzt:
+\begin{enumerate}
+  \item Übergabeparameter
+    \begin{enumerate}
+      \item Straßenbelegung \(w_t\) zum Zeitpunkt \(t\),  also die Zeile \(t\) der Matrix \(W\)       
+      \item Geschwindigkeiten \(v_t\) zum Zeitpunkt \(t\),  also die Zeile \(t\) der Matrix \(V\)       
+      \item Koordinate der Kreuzung \(c\) 
+      \item Maximale Geschindigkeit \(v_{max}\)
+    \end{enumerate}
+  \item Rückgabewerte
+    \begin{enumerate}
+      \item Vektor \(\hat{v}\) der Länge \(N\) mit \(\hat{v}_i\) ist neue Geschwindigkeit des Autos der Zelle \(i\)
+    \end{enumerate}
+\end{enumerate}
+Insbesondere bleiben Autos zunächst vor der Kreuzung stehen. Nach dem Aufruf von \code{adjustSpeed.m} für die
+Horizontale und die Vertikale kann also entschieden werden ob ein Auto den Kreuzungspunkt betretten darf. 
+Dazu wird überprüft ob die Kreuzung frei. Es bezeichne \(W^h\), \(\hat{v}^h\) und \(c^h\) 
+die Autonummernmatrix, den angepassten Geschwindigkeitsvektor und den Kreuzungspunkt der Horizontalen, sowie
+\(W^v\), \(\hat{v}^v\), \(c^v\) das selbige für die Vertikale. Ist die Kreuzung frei so muss demnach gelten: 
+\[W^h_{t,c^h} = 0 = W^v_{t,c^v}\] 
+Ist dies der Fall und steht auf der Vertikalen
+ein Auto vor der Kreuzung 
+\[W^v_{t,c^v-1} \neq 0\] so darf dieses Auto über die Kreuzung mit Geschwindigkeit \(1\). 
+Es wird also 
+\[\hat{v}^v_{c^v-1} = 1\] 
+gesetzt. Steht auf der Vertikalen kein Auto for der Kreuzung, 
+aber auf der Horizontalen 
+\[W^h_{t,c^h-1} \neq 0\]
+so wird dessen angepasste Geschwindigkeit auf \(1\) gesetzt. 
+Damit ist die Regel \textit{Rechts vor Links} umgesetzt.
+
+Hiernach wird für beide Straßen einzeln getrödelt (\code{linger.m}), also mit einer festgesetzten Wahrscheinlichkeit werden
+die Geschwindigkeiten in \(\hat{v}\) um eine Einheit reduziert. 
+Schließlich erfolgt durch die Funktion \code{shift.m} für beide Straßen einzeln die Berechnung des nächsten Zeitschrittes, 
+also der Zeile \(t+1\) in den Matrizen \(V,W\) gemäß der Geschwindigkeiten \(\hat{v}\).
+
+Der hier beschriebene Vorgang zur Berechnung der Zeitschritte ist in der Funktion \code{nagelschreckenberg.m} umgesetzt, 
+sodass über die oben beschriebene GUI mit verschiedenen Startbedingungen (z.B. Trödelwahrscheinlichkeiten, Verkehrsdichten, Streckenlängen) experimentiert werden kann.
+
+
