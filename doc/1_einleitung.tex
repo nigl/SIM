@@ -1,7 +1,20 @@
 \chapter{Einleitung}
 
-\section{Aufgabenstellung}\label{sec:aufgabenstellung}
+In der Verkehrsplanung ist es das Ziel, jedem Verkehrsteilnehmer den schnellsten Weg von A nach B zu gewährleisten. Da aber die Verteilung der Fahrzeuge auf den Straßen vom Zufall abhängt, ist es nicht wunderlich, dass dort Simulationen benötigt werden. \\ \\
+Interessiert man sich z. B. dafür, ob an einer Kreuzung die durch eine Ampelschaltung geregelt wird, es für den Verkehrsfluss besser ist, diese durch einen Kreisverkehr zu ersetzen, so kann diese Frage mit Hilfe einer Simulation beantworten werden. Auch die Frage, wie die Ampeln untereinander geschaltet werden müssen, um maximalen Verkehrsfluss zu gewährleisten, ist eine äußerst schwierige Frage, die man nur mit Hilfe von Simulationen beantworten kann. \\ \\
+Im Nachfolgenden wollen wir auf eine spezielle Kreuzung genauer eingehen.
 
+\section{Aufgabenstellung}\label{sec:aufgabenstellung}
+In unserer Ausarbeitung konzentrieren wir uns auf zwei einspurige Ringstraßen, die jeweils nur in eine Richtung befahren werden. Diese kreuzen sich in genau einem Punkt. Die Kreuzung der beiden Ringstraßen ist durch Rechts-Vor-Links geregelt und die Verkehrsteilnehmer dürfen die jeweilige Ringstraße nicht verlassen. D. h. die Autofahrer dürfen an der Kreuzung nur gerade ausfahren. 
+\\ \\
+%Wir gehen der Frage nach, wie sich der Verkehrsfluss verhält, in Abhängigkeit der Dichten $\rho_1$ und $\rho_2$ der beiden Ringstraßen.
+Unsere Aufgabe war es, diese Kreuzung zunächst zu simulieren, um anschließend die Frage beantworten zu können, wie sich der Verkehrsfluss in Abhängigkeit der Verkehrsdichten %$\rho_1$ und $\rho_2$ 
+der Ringstraßen verändert.
 \section{Umsetzung}
-TODO kurz beschreiben was wir gemacht haben (um die aufgaben zu
-bwältigen wurde ein matlabprogramm erstellt mit dem sich ...) etc.
+Bevor wir die in der Aufgabenstellung beschriebene Kreuzung simulieren konnten, mussten wir diese mit Hilfe des Nagel-Schreckenberg-Modells modellieren und dabei Annahmen treffen (siehe Kapitel \ref{chap2}). Auf Basis dieses Modells erstellten wir ein Matlab-Programm, welches uns die Situation in Abhängigkeit der Verkehrsdichten in einer Animation aufzeigt (siehe Kapitel \ref{chap3}). Um sicher zu gehen, dass das Programm auch unser Modell richtig beschreibt,
+%Natürlich ist es auch wichtig zu wissen ob das Programm überhaupt korrekt arbeitet, deshalb 
+überprüften wir dieses mit Hilfe einiger Testdaten (siehe Kapitel \ref{chap4}). Nun konnten wir Aussagen darüber treffen, wie Veränderungen der Verkehrsdichten den Verkehrsfluss der Kreuzung beeinflussen und ob beide Dichten den gleichen Einfluss haben (siehe Kapitel \ref{chap5}).
+
+\begin{flushright}
+Autor: Julian Berndt
+\end{flushright}
